@@ -19,7 +19,7 @@ def load_proxies():
 
 proxies = load_proxies()
 
-# HANDLE SEMUA ERROR TAROH DISINI BANG SAFE_POST
+# HANDLE ALL TAROH ERRORS HERE BANG SAFE_POST
 def safe_post(url, headers, json_payload):
     retries = 5
     timeout = 5  # Timeout in seconds for each connection attempt
@@ -52,7 +52,7 @@ def safe_post(url, headers, json_payload):
                 print(f"❌ Failed with status {res.status}, retrying...")
         except (http.client.HTTPException, TimeoutError) as e:
             print(f"❌ Error: {e}, retrying...")
-        if attempt < retries - 1:  # Jika ini bukan percobaan terakhir, tunggu sebelum mencoba lagi
+        if attempt < retries - 1:  # If this isn't your last try, wait before trying again
             time.sleep(10)
         else:
             print("❌ Failed after multiple attempts. Restarting...")
@@ -63,7 +63,7 @@ def generate_random_nonce(length=52):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
-# Mendapatkan akses token
+# Get token access
 def fetch(account_line):
     with open('query_id.txt', 'r') as file:
         lines = file.readlines()
@@ -123,12 +123,12 @@ def fetch(account_line):
     else:
         return None
 
-# Cek akses token
+# Check token access
 def cek_user(index):
     access_token = fetch(index + 1)
     url = "api-gw-tg.memefi.club"
 
-    headers = headers_set.copy()  # Membuat salinan headers_set agar tidak mengubah variabel global
+    headers = headers_set.copy()  # Make a copy of headers_set so as not to change global variables
     headers['Authorization'] = f'Bearer {access_token}'
 
     json_payload = {
@@ -140,16 +140,16 @@ def cek_user(index):
     response = safe_post(url, headers, json_payload)
     if response and 'errors' not in response:
         user_data = response['data']['telegramUserMe']
-        return user_data  # Mengembalikan hasil response
+        return user_data  # Returns the response results
     else:
         print(f"❌ Failed with status {response}")
-        return None  # Mengembalikan None jika terjadi error
+        return None  # Returns None if an error occurs
 
 def activate_energy_recharge_booster(index, headers):
     access_token = fetch(index + 1)
     url = "api-gw-tg.memefi.club"
 
-    headers = headers_set.copy()  # Membuat salinan headers_set agar tidak mengubah variabel global
+    headers = headers_set.copy()  # Make a copy of headers_set so as not to change global variables
     headers['Authorization'] = f'Bearer {access_token}'
 
     recharge_booster_payload = {
@@ -170,7 +170,7 @@ def activate_booster(index, headers):
     url = "api-gw-tg.memefi.club"
     print("\r🚀 Activating Turbo Boost... ", end="", flush=True)
 
-    headers = headers_set.copy()  # Membuat salinan headers_set agar tidak mengubah variabel global
+    headers = headers_set.copy()  # Make a copy of headers_set so as not to change global variables
     headers['Authorization'] = f'Bearer {access_token}'
 
     recharge_booster_payload = {
@@ -283,7 +283,7 @@ def check_and_complete_tasks(index, headers):
     if response and 'errors' not in response:
         tasks = response
     else:
-        print(f"❌ Gagal dengan status {response}")
+        print(f"❌ Failed with status {response}")
         return False
 
     all_completed = all(task['status'] == 'Completed' for task in tasks['data']['campaignTasks'])
@@ -291,7 +291,7 @@ def check_and_complete_tasks(index, headers):
         print(f"\r[ Account {index + 1} ] All tasks completed. ✅            ", flush=True)
         return True
 
-    print(f"\n[ Akun {index + 1} ]\nList Task:\n")
+    print(f"\n[ Account {index + 1} ]\nList Task:\n")
     for task in tasks['data']['campaignTasks']:
         print(f"{task['name']} | {task['status']}")
 
@@ -314,7 +314,7 @@ def check_and_complete_tasks(index, headers):
 
   
 
-            print(f"\r🔍 Verifikasi task: {task['name']}                                                                ", end="", flush=True)
+            print(f"\r🔍 Verify tasks: {task['name']}                                                                ", end="", flush=True)
             verify_task_payload = {
                 "operationName": "CampaignTaskToVerification",
                 "variables": {"userTaskId": task['userTaskId']},
@@ -353,13 +353,13 @@ def check_and_complete_tasks(index, headers):
 
 def main():
     print("Starting Memefi bot...")
-    print("\r Mendapatkan list akun valid...", end="", flush=True)
+    print("\r Getting a list of valid accounts...", end="", flush=True)
   
     while True:
         with open('query_id.txt', 'r') as file:
             lines = file.readlines()
 
-        # Kumpulkan informasi akun terlebih dahulu
+        # Collect account information first
         accounts = []
         for index, line in enumerate(lines):
             result = cek_user(index)
@@ -371,12 +371,12 @@ def main():
             else:
                 print(f"❌ Account {index + 1}: Token is invalid or an error occurred")
 
-        # Menampilkan daftar akun
-        print("\rList akun:                                   ", flush=True)
+        # Displays a list of accounts
+        print("\rAccount Lst:                                   ", flush=True)
         for index, _, first_name, last_name, league in accounts:
             print(f"✅ [ Account {first_name} {last_name} ] | League 🏆 {league}")
 
-        # Setelah menampilkan semua akun, mulai memeriksa tugas
+        # After displaying all accounts, start checking tasks
         for index, result, first_name, last_name, league in accounts:
             print(f"\r[ Account {index + 1} ] {first_name} {last_name} check task...", end="", flush=True)
             headers = {'Authorization': f'Bearer {result}'}
@@ -389,7 +389,7 @@ def main():
             if stat_result is not None:
                 user_data = stat_result
                 output = (
-                    f"[ Akun {index + 1} - {first_name} {last_name} ]\n"
+                    f"[ Account {index + 1} - {first_name} {last_name} ]\n"
                     f"Coin 🪙  {user_data['coinsAmount']:,} 🔋 {user_data['currentEnergy']} - {user_data['maxEnergy']}\n"
                     f"Level 🔫 {user_data['weaponLevel']} 🔋 {user_data['energyLimitLevel']} ⚡ {user_data['energyRechargeLevel']} 🤖 {user_data['tapBotLevel']}\n"
                     f"Boss 👾 {user_data['currentBoss']['level']} ❤️ {user_data['currentBoss']['currentHealth']} - {user_data['currentBoss']['maxHealth']}\n"
@@ -400,7 +400,7 @@ def main():
                 darah_bos = user_data['currentBoss']['currentHealth']
 
                 if darah_bos == 0:
-                    print("\nBos telah dikalahkan, mengatur bos berikutnya...", flush=True)
+                    print("\nThe boss has been defeated, set the next boss...", flush=True)
                     set_next_boss(index, headers)
                 print("\rTapping 👆", end="", flush=True)
 
@@ -412,15 +412,15 @@ def main():
                 if energy_sekarang < 0.25 * user_data['maxEnergy']:
                     if auto_booster == 'y':
                         if user_data['freeBoosts']['currentRefillEnergyAmount'] > 0:
-                            print("\r🪫 Energy Habis, mengaktifkan Recharge Booster... \n", end="", flush=True)
+                            print("\r🪫 Energy Exhausted, activate Recharge Booster... \n", end="", flush=True)
                             activate_energy_recharge_booster(index, headers)
-                            continue  # Lanjutkan tapping setelah recharge
+                            continue  # Continue tapping after recharging
                         else:
                             print("\r🪫 Energy Out, no boosters available. Switch to next account.\n", flush=True)
-                            continue  # Beralih ke akun berikutnya
+                            continue  # Switch to the next account
                     else:
                         print("\r🪫 Energy Out, auto booster disabled. Switch to next account.\n", flush=True)
-                        continue  # Beralih ke akun berikutnya
+                        continue  # Switch to the next account
 
                 tap_payload = {
                     "operationName": "MutationGameProcessTapsBatch",
@@ -436,7 +436,7 @@ def main():
                 if tap_result is not None:
                     print(f"\rTapped ✅\n ")
                 else:
-                    print(f"❌ Failed with status {tap_result}, mencoba lagi...")
+                    print(f"❌ Failed with status {tap_result}, try again...")
 
                 if auto_claim_combo == 'y':
                     claim_combo(index, headers)
@@ -444,21 +444,21 @@ def main():
                     if user_data['freeBoosts']['currentTurboAmount'] > 0:
                         activate_booster(index, headers)
 
-        print("=== [ SEMUA AKUN TELAH DI PROSES ] ===")
+        print("=== [ ALL ACCOUNTS HAVE BEEN PROCESSED ] ===")
 
         animate_energy_recharge(15)
 
-# Jalankan fungsi main() dan simpan hasilnya
+# Run the main() function and save the result
 
 
 def claim_combo(index, headers):
     access_token = fetch(index + 1)
     url = "api-gw-tg.memefi.club"
-    headers = headers_set.copy()  # Membuat salinan headers_set agar tidak mengubah variabel global
+    headers = headers_set.copy()  # Make a copy of headers_set so as not to change global variables
     headers['Authorization'] = f'Bearer {access_token}'
 
     nonce = generate_random_nonce()
-    taps_count = random.randint(5, 10)  # Contoh: tapsCount dinamis antara 5 dan 10
+    taps_count = random.randint(5, 10)  # Example: dynamic tapsCount between 5 and 10
     claim_combo_payload = {
         "operationName": "MutationGameProcessTapsBatch",
         "variables": {
@@ -533,7 +533,7 @@ def animate_energy_recharge(duration):
         for frame in frames:
             print(f"\r🪫 Mengisi ulang energi {frame} - Tersisa {remaining_time} detik         ", end="", flush=True)
             time.sleep(0.25)
-    print("\r🔋 Pengisian energi selesai.                            ", flush=True)
+    print("\r🔋 Energy charging is complete.                            ", flush=True)
 
 cek_task_enable = 'n'
 while True:
@@ -578,5 +578,5 @@ if auto_claim_combo == 'y':
         else:
             print("Masukkan combo yang valid.")
 
-# Jalankan fungsi main() dan simpan hasilnya
+# Run the main() function and save the result
 main()
